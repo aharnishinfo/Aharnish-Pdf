@@ -1,0 +1,21 @@
+import React, { useState } from 'react';
+import { MessageCircle, Send, X } from 'lucide-react';
+const answer = q => { const text = q.toLowerCase().trim();
+  if (/^(hi|hello|hey|hii)\b/.test(text)) return 'Hello! I’m the Aharnish PDF assistant. Tell me what you want to do with your file, and I’ll guide you step by step.';
+  if (/(thank|thanks)/.test(text)) return 'You’re welcome! If anything is unclear, just ask me another question.';
+  if (/(merge|combine|join)/.test(text)) return 'To merge files: click Merge PDF, choose two or more PDF files, then press “Merge PDF now”. Your combined file will download automatically.';
+  if (/(split|extract)/.test(text)) return 'For Split PDF, upload one PDF and enter the pages you want, such as “1-3, 5”. The new PDF containing those pages will download when processing finishes.';
+  if (/(remove|delete).*page|page.*(remove|delete)/.test(text)) return 'Use Remove pages. Upload the PDF and enter page numbers or ranges to remove, for example “2, 4-6”. At least one page must remain.';
+  if (/(rotate)/.test(text)) return 'Open Rotate PDF, upload your file, choose 90°, 180°, or 270°, then click the processing button.';
+  if (/(watermark)/.test(text)) return 'Open Add watermark, upload a PDF, type the watermark text you want, and process it. The watermark is applied across the document.';
+  if (/(page number|numbering)/.test(text)) return 'Choose Add page numbers, upload your PDF, and process it. Page numbers are added automatically near the bottom of every page.';
+  if (/(crop|margin)/.test(text)) return 'Use Crop PDF to trim page margins. Enter a small percentage such as 5 for a gentle crop, then download the processed file.';
+  if (/(jpg|jpeg|png|image|photo)/.test(text)) return 'For JPG/PNG to PDF, select one or more images. For PDF to JPG/PNG, upload a PDF; the first page is exported as an image.';
+  if (/(word|docx|excel|xlsx|powerpoint|ppt|html)/.test(text)) return 'Choose the matching conversion card. Word, Excel, PowerPoint, and HTML conversions use LibreOffice, so keep LibreOffice installed and the backend running.';
+  if (/(form)/.test(text)) return 'PDF Forms adds a fillable text field to the first page. You can set its placeholder text before processing.';
+  if (/(download|where.*file|file.*saved)/.test(text)) return 'Completed files download through your browser automatically. Look in your browser’s Downloads list or your computer’s Downloads folder.';
+  if (/(error|fail|not work|problem|blank|api)/.test(text)) return 'First confirm both terminals are running: frontend should show Vite ready, and backend should show “API ready”. Then upload the correct file type. If an error message appears, send me its exact text.';
+  if (/(what.*(can|do)|help|tool)/.test(text)) return 'I can help with merging, splitting, removing pages, JPG/PNG conversion, Office conversion, rotation, watermarks, page numbers, cropping, editing, forms, downloads, and errors.';
+  return 'I want to help. Could you tell me which tool or file type you are using—for example: “How do I convert JPG to PDF?”';
+};
+export default function HelpChat(){const [open,setOpen]=useState(false),[messages,setMessages]=useState([{from:'bot',text:'Hello! I’m here to help with Aharnish PDF. What would you like to do today?'}]),[value,setValue]=useState(''); const send=()=>{if(!value.trim())return;const q=value.trim();setMessages(m=>[...m,{from:'user',text:q},{from:'bot',text:answer(q)}]);setValue('')};return <><button className="help-button" onClick={()=>setOpen(true)}>HELP <MessageCircle size={16}/></button>{open&&<section className="help-chat"><header><strong>Aharnish PDF Help</strong><button onClick={()=>setOpen(false)}><X size={18}/></button></header><div className="messages">{messages.map((m,i)=><p key={i} className={m.from}>{m.text}</p>)}</div><div className="chat-input"><input value={value} onChange={e=>setValue(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()} placeholder="Ask a question…"/><button onClick={send}><Send size={17}/></button></div></section>}</>}
