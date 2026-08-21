@@ -18,7 +18,25 @@ const sofficePath = process.env.LIBREOFFICE_PATH || 'C:\\Program Files\\LibreOff
 await fs.mkdir(tempDir, { recursive: true });
 const app = express();
 app.set('trust proxy', true);
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173' }));
+const allowedOrigins = [
+  'https://aharnish-pdf.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  process.env.CLIENT_ORIGIN
+].filter(Boolean);
+
+app.use(cors({
+  origin(origin, callback) {
+    // Requests without an Origin header include curl, mobile clients, and server-to-server calls.
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      return callback(null, true);
+    }
+    return callback(new Error('Blocked by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 const upload = multer({ dest: tempDir, limits: { fileSize: 50 * 1024 * 1024 } });
 const safeName = (name) => name.replace(/[^a-z0-9._-]/gi, '_');
